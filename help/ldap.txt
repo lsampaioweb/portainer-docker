@@ -1,0 +1,10 @@
+LDAP Server               : openldap:389
+Reader DN                 : cn=ldap-reader,dc=homelab
+
+Base DN                   : ou=users,dc=homelab
+Username attribute        : uid
+Filter                    : (&(objectClass=posixAccount)(memberOf=cn=portainer-user,ou=groups,dc=homelab))
+
+Group Base DN             : ou=groups,dc=homelab
+Group Membership Attribute: uniqueMember
+Group Filter              : (objectClass=groupOfUniqueNames)

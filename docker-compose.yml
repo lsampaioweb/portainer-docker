@@ -1,0 +1,48 @@
+version: "3.7"
+
+services:
+  portainer:
+    image: registry.libraries.homelab/portainer/portainer:latest
+    container_name: portainer
+    restart: always
+    volumes:
+      - ${ETC_LOCALTIME}:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+      #- ./backup:/app/backup
+      #- ../certificates/:/certs/
+    networks:
+      - net-proxy
+      - net-ldap
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=net-proxy
+      - traefik.frontend.rule=Host:portainer.homelab
+      - traefik.frontend.passHostHeader=true
+      - traefik.frontend.headers.SSLRedirect=true
+      - traefik.frontend.headers.forceSTSHeader=true
+      - traefik.frontend.headers.STSSeconds=315360000
+      - traefik.frontend.headers.STSIncludeSubdomains=true
+      - traefik.frontend.headers.STSPreload=true
+      - traefik.frontend.headers.browserXSSFilter=true
+      - traefik.frontend.headers.contentTypeNosniff=true
+      - traefik.backend=portainer
+      - traefik.port=9000
+    command: -H unix:///var/run/docker.sock
+
+    # healthcheck:
+    #   test: wget --tries=1 --spider --no-check-certificate http://localhost/ping || exit 1
+    #   start_period: 5s #default: 0s
+    #   interval: 1m #default: 30s
+    #   timeout: 5s #default: 30s
+    #   retries: 5 #default: 3
+
+volumes:
+  portainer-data:
+    external: true
+    
+networks:
+  net-proxy:
+    external: true
+  net-ldap:
+    external: true
